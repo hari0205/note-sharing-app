@@ -7,12 +7,14 @@ import {
   Logger,
   Post,
   Res,
+  UseFilters,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { Response } from 'express';
+import { BadRequestExceptionFilter } from './filters/bad-request.filter';
 
 @Controller('auth')
 export class AuthController {
@@ -24,6 +26,7 @@ export class AuthController {
   ) {}
 
   @Post('signup')
+  @UseFilters(new BadRequestExceptionFilter())
   @HttpCode(HttpStatus.CREATED)
   async signup(@Body() createUserDto: CreateUserDto) {
     const user = await this.userService.createUser(createUserDto);
@@ -37,6 +40,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @UseFilters(new BadRequestExceptionFilter())
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginDto: LoginDto,

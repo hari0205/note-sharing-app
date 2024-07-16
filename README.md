@@ -79,3 +79,11 @@ Just run the docker compose
 `docker-compose up`
 
 You can now access the API at localhost:3000
+
+- POST `/api/v1/auth/signup` - Sign up user
+- POST `/api/v1/auth/login` - Login user
+- POST `api/v1/notes` - Create a not
+- GET `/api/v1/notes` - Get all nootes by user
+- GET `/api/v1/notes/:id` - Get a note by ID
+- PUT `/api/v1/notes/:id` - Edit a not
+- POST `/api/v1/notes/share` - Share a not. Can be viewed by GET `/api/v1/notes/:id`

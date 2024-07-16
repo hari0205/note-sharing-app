@@ -1,7 +1,12 @@
+import { IsNotEmpty, IsString } from 'class-validator';
 import { ILogin } from '../interface/login';
 
 export class LoginDto implements ILogin {
-  username!: string;
+  @IsString()
+  @IsNotEmpty()
+  username: string;
 
-  password!: string;
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 }
