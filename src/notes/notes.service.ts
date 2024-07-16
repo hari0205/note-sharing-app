@@ -1,4 +1,10 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notes } from './notes.entity';
 import { In, Repository } from 'typeorm';
@@ -62,25 +68,45 @@ export class NotesService {
     return notes;
   }
 
-  async getNoteById(id: number) {
+  async getNoteById(id: number, username: string): Promise<Notes> {
+    const note = await this.notesRepository.findOne({
+      where: { id },
+      relations: ['createdBy', 'sharedWith'],
+    });
+
+    if (!note) {
+      throw new NotFoundException(`Note with ID ${id} does not exist`);
+    }
+
+    // Check if the user is the creator or a shared user by username
+    const isOwner = note.createdBy.username === username;
+    const isSharedUser = note.sharedWith.some(
+      (user) => user.username === username,
+    );
+
+    if (!isOwner && !isSharedUser) {
+      throw new UnauthorizedException(
+        'You do not have permission to view this note',
+      );
+    }
+
+    return note;
+  }
+
+  async getNoteHistory(noteId: number): Promise<NoteHistory[]> {
     const note = await this.notesRepository
-      .findOneBy({ id })
+      .findOneBy({ id: noteId })
       .catch((err) => this.logger.error(err));
 
     this.logger.debug(note);
 
     if (!note) {
-      this.logger.error(`Note with ${id} does not exist`);
+      this.logger.error(`Note with ${noteId} does not exist`);
       throw new EntityNotFoundException(
         'Note',
-        `The note with ${id} does not exist`,
+        `The note with ${noteId} does not exist`,
       );
     }
-    return note;
-  }
-
-  async getNoteHistory(noteId: number): Promise<NoteHistory[]> {
-    const note = await this.getNoteById(noteId);
 
     this.logger.debug(`Note with ${noteId}` + JSON.stringify(note));
 
@@ -142,30 +168,45 @@ export class NotesService {
     return note;
   }
 
-  async shareNoteWithUsers(noteId: number, usernames: string[]): Promise<void> {
+  async shareNoteWithUsers(
+    noteId: number,
+    usernames: string[],
+    requestorUsername: string,
+  ): Promise<void> {
     const note = await this.notesRepository.findOne({
       where: { id: noteId },
-      relations: ['sharedWith'],
+      relations: ['sharedWith', 'createdBy'],
     });
 
-    this.logger.debug(note);
-    if (!note)
-      throw new EntityNotFoundException(
-        'Note not found',
-        `Note ${noteId} not found`,
-      );
+    this.logger.debug(JSON.stringify(note));
 
-    const users = await this.userRepository.find({
-      where: { username: In(usernames) },
-    });
-
-    this.logger.debug(users);
-    // If one of the users in the user list is invalid
-    if (users.length !== usernames.length) {
-      throw new EntityNotFoundException('One or more users not found');
+    if (!note) {
+      throw new NotFoundException('Note not found');
     }
 
-    note.sharedWith = users;
+    // Check if the requestor is the note creator
+    if (note.createdBy.username !== requestorUsername) {
+      throw new UnauthorizedException(
+        'You are not authorized to share this note',
+      );
+    }
+
+    if (usernames.includes(note.createdBy.username)) {
+      throw new UnauthorizedException('You cannot share this note to yourself');
+    }
+
+    const users = await this.userRepository.findBy({ username: In(usernames) });
+
+    if (users.length !== usernames.length) {
+      throw new NotFoundException('One or more users not found');
+    }
+
+    const newSharedUsers = users.filter(
+      (user) =>
+        !note.sharedWith.some((sharedUser) => sharedUser.id === user.id),
+    );
+    note.sharedWith = [...note.sharedWith, ...newSharedUsers];
     await this.notesRepository.save(note);
+
   }
 }
