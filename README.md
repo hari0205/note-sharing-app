@@ -71,3 +71,11 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+## Steps to run
+
+Just run the docker compose
+
+`docker-compose up`
+
+You can now access the API at localhost:3000

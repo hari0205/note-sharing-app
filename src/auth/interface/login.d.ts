@@ -1,4 +1,4 @@
-export interface ICreateUser {
+export interface ILogin {
   username: string;
   password: string;
 }

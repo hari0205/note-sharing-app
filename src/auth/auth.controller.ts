@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
+  Logger,
   Post,
   Res,
 } from '@nestjs/common';
@@ -15,6 +16,8 @@ import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
+
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
@@ -39,6 +42,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const token = await this.authService.login(loginDto);
+    this.logger.debug('Received token', token);
     if (!token) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     res.cookie('authorization', token, {
       maxAge: 1000 * 60 * 60 * 24,

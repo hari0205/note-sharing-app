@@ -1,9 +1,7 @@
-import { CreateUser } from '../interface/create-user';
-import { IsEmail, IsString, IsStrongPassword } from 'class-validator';
+import { ICreateUser } from '../interface/create-user';
+import { IsString } from 'class-validator';
 
-export class CreateUserDto implements CreateUser {
-
-
+export class CreateUserDto implements ICreateUser {
   @IsString()
   username: string;
 

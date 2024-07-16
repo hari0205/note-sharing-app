@@ -1,6 +1,6 @@
-import { CreateUserDto } from './create-user.dto';
+import { ILogin } from '../interface/login';
 
-export class LoginDto {
+export class LoginDto implements ILogin {
   username!: string;
 
   password!: string;
