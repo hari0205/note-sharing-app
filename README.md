@@ -74,6 +74,8 @@ Nest is [MIT licensed](LICENSE).
 
 ## Steps to run
 
+> To run this you need to have docker installed 
+
 Just run the docker compose
 
 `docker-compose up`
@@ -87,3 +89,5 @@ You can now access the API at localhost:3000
 - GET `/api/v1/notes/:id` - Get a note by ID
 - PUT `/api/v1/notes/:id` - Edit a not
 - POST `/api/v1/notes/share` - Share a not. Can be viewed by GET `/api/v1/notes/:id`
+
+> Please make sure all the services in docker compose are ready before making requests

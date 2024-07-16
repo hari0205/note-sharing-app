@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Req,
+  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -20,8 +21,10 @@ import { AuthenticatedRequest } from 'src/types/express/express';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { log } from 'console';
 import { ShareNoteDto } from './dto/share-note.dto';
+import { BadRequestExceptionFilter } from './filters/bad-request.filter';
 
 @Controller('notes')
+@UseFilters(new BadRequestExceptionFilter())
 export class NotesController {
   private readonly logger = new Logger(NotesController.name);
 
