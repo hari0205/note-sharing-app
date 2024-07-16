@@ -1,5 +1,4 @@
 import {
-  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -207,6 +206,5 @@ export class NotesService {
     );
     note.sharedWith = [...note.sharedWith, ...newSharedUsers];
     await this.notesRepository.save(note);
-
   }
 }

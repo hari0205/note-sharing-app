@@ -60,9 +60,8 @@ export class NotesController {
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard)
   async getNoteById(@Param('id') id: number, @Req() req: AuthenticatedRequest) {
-
-    const {username} = req.user;
-    const notes = this.notesService.getNoteById(id,username);
+    const { username } = req.user;
+    const notes = this.notesService.getNoteById(id, username);
     return notes;
   }
 
@@ -93,14 +92,16 @@ export class NotesController {
   @Post('/share')
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
-  async shareNote(@Body() shareNoteDto: ShareNoteDto, @Req() req: AuthenticatedRequest) {
-
-    const {username} = req.user
+  async shareNote(
+    @Body() shareNoteDto: ShareNoteDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const { username } = req.user;
 
     await this.notesService.shareNoteWithUsers(
       shareNoteDto.noteId,
       shareNoteDto.usernames,
-      username
+      username,
     );
     return {
       statusCode: HttpStatus.OK,

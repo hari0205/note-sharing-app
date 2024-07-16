@@ -13,7 +13,7 @@ import { NoteHistory } from './note-history.entity';
 import { INote } from './interfaces/note-entity';
 
 @Entity()
-export class Notes implements INote{
+export class Notes implements INote {
   @PrimaryGeneratedColumn()
   id: number;
 
