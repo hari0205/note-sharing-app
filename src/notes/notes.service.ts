@@ -80,6 +80,10 @@ export class NotesService {
   }
 
   async getNoteHistory(noteId: number): Promise<NoteHistory[]> {
+    const note = await this.getNoteById(noteId);
+
+    this.logger.debug(`Note with ${noteId}` + JSON.stringify(note));
+
     const history = await this.noteHistoryRepository.find({
       where: { note: { id: noteId } },
       relations: ['changedBy'],
